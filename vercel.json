@@ -1,5 +1,5 @@
 {
-  "buildCommand": "rm -rf client/node_modules && npm install --prefix client && ls -la client/node_modules/.bin/webpack && npm run build --prefix client",
+  "buildCommand": "rm -rf client/node_modules && npm install --prefix client && npm run build --prefix client",
   "outputDirectory": "client/dist",
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" },
