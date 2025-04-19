@@ -313,7 +313,7 @@ verify_jwt = true
 import_map = "./functions/instagram-scraper/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
-entrypoint = "./functions/instagram-scraper/index.ts"
+entrypoint = "./functions/instagram-scraper/index.js"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
 # static_files = [ "./functions/instagram-scraper/*.html" ]
@@ -324,7 +324,7 @@ verify_jwt = true
 import_map = "./functions/tiktok-scraper/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
-entrypoint = "./functions/tiktok-scraper/index.ts"
+entrypoint = "./functions/tiktok-scraper/index.js"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
 # static_files = [ "./functions/tiktok-scraper/*.html" ]
