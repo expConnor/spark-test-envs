@@ -4,6 +4,8 @@ import { createCampaignScrape } from "./create/createCampaign.js";
 import { retrieveStandardScrape } from "./retrieve/retrieveStandard.js";
 import { retrieveCampaignScrape } from "./retrieve/retrieveCampaign.js";
 
+// test comment at 09:54
+
 serve(async (req) => {
   try {
     const body = await req.json();
