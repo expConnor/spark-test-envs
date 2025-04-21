@@ -9,20 +9,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Wait for Checks
+      - name: Wait for Vercel Check
         uses: louisbrunner/checks-action@v2.0.0
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          sha: ${{ github.sha }}
-          checks: Supabase/*,Vercel/*
-          conclusions: success,skipped
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: Vercel/*
+          conclusion: success
+      - name: Wait for Supabase Check
+        uses: louisbrunner/checks-action@v2.0.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: Supabase/*
+          conclusion: success,skipped
       - name: Merge and Sync
         run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git checkout main
-          git merge origin/staging -m "Merge staging to main"
-          git push origin main
-          git checkout staging
-          git merge main
-          git push origin staging
+          git config user.name "GitHub Actions" && git config user.email "actions@github.com" && git checkout main && git merge origin/staging -m "Merge staging to main" && git push origin main && git checkout staging && git merge main && git push origin staging
