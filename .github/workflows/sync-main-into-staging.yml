@@ -1,4 +1,4 @@
-name: Sync Main back into Staging
+name: Sync branches
 on:
   push:
     branches:
@@ -7,7 +7,7 @@ on:
 jobs:
   sync-branches:
     runs-on: ubuntu-latest
-    name: Syncing branches
+    name: Sync Main back into Staging
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -21,4 +21,4 @@ jobs:
         with:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
           FROM_BRANCH: "main"
-          TO_BRANCH: "develop"
+          TO_BRANCH: "staging"
