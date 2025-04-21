@@ -1,4 +1,4 @@
-name: Auto PR from Staging to Main
+name: Auto Merge Staging to Main
 on:
   push:
     branches:
@@ -6,16 +6,20 @@ on:
   workflow_dispatch:
 
 jobs:
-  create-pr-to-main:
+  merge-staging-to-main:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v7
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "Merge staging into main"
-          title: "Merge staging into main"
-          body: "Automated PR to merge staging into main after push to staging."
-          branch: staging
-          base: main
+          fetch-depth: 0 # Fetch all history for merging
+      - name: Configure Git
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+      - name: Merge staging into main
+        run: |
+          git checkout main
+          git merge origin/staging --no-ff -m "Auto-merge staging into main"
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
