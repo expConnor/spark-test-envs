@@ -1,24 +1,28 @@
-name: Sync branches
+name: Sync Branches
 on:
   push:
     branches:
       - main
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   sync-branches:
     runs-on: ubuntu-latest
-    name: Sync Main back into Staging
+    name: Sync main to staging
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Set up Node
-        uses: actions/setup-node@v1
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: 12
-      - name: Opening pull request
-        id: pull
+          node-version: 22
+      - name: Open pull request
         uses: tretuna/sync-branches@1.4.0
         with:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           FROM_BRANCH: "main"
           TO_BRANCH: "staging"
+          CONTENT_COMPARISON: true
