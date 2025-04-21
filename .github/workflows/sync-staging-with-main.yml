@@ -1,0 +1,16 @@
+name: Merge Main into Staging
+on:
+  push:
+    branches:
+      - main
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Merge main into staging
+        run: |
+          git fetch origin
+          git checkout staging
+          git merge --no-ff origin/main
+          git push origin staging
