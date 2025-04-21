@@ -15,12 +15,21 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           name: Vercel/*
           conclusion: success
-      - name: Wait for Supabase Check
+      - name: Wait for Supabase Check (Success)
+        id: supabase-success
+        uses: louisbrunner/checks-action@v2.0.0
+        continue-on-error: true
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: Supabase/*
+          conclusion: success
+      - name: Wait for Supabase Check (Skipped)
+        if: steps.supabase-success.outcome != 'success'
         uses: louisbrunner/checks-action@v2.0.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           name: Supabase/*
-          conclusion: success,skipped
+          conclusion: skipped
       - name: Merge and Sync
         run: |
           git config user.name "GitHub Actions" && git config user.email "actions@github.com" && git checkout main && git merge origin/staging -m "Merge staging to main" && git push origin main && git checkout staging && git merge main && git push origin staging
