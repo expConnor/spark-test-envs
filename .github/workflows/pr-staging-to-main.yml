@@ -1,25 +1,28 @@
-name: Auto Merge Staging to Main
+name: Merge Staging to Main
 on:
   push:
     branches:
       - staging
-  workflow_dispatch:
 
 jobs:
-  merge-staging-to-main:
+  merge:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Wait for Checks
+        uses: louisbrunner/checks-action@v2.0.0
         with:
-          fetch-depth: 0 # Fetch all history for merging
-      - name: Configure Git
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          sha: ${{ github.sha }}
+          checks: Supabase/*,Vercel/*
+          conclusions: success,skipped
+      - name: Merge and Sync
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-      - name: Merge staging into main
-        run: |
           git checkout main
-          git merge origin/staging --no-ff -m "Auto-merge staging into main"
+          git merge origin/staging -m "Merge staging to main"
           git push origin main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          git checkout staging
+          git merge main
+          git push origin staging
