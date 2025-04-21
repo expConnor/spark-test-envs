@@ -15,7 +15,7 @@ jobs:
         uses: louisbrunner/checks-action@v2.0.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          name: Vercel/*
+          name: Vercel
           conclusion: success
       - name: Wait for Supabase Check (Success)
         id: supabase-success
@@ -23,14 +23,14 @@ jobs:
         continue-on-error: true
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          name: Supabase/*
+          name: Supabase Preview
           conclusion: success
       - name: Wait for Supabase Check (Skipped)
         if: steps.supabase-success.outcome != 'success'
         uses: louisbrunner/checks-action@v2.0.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          name: Supabase/*
+          name: Supabase Preview
           conclusion: skipped
       - name: Merge and Sync
         run: |
