@@ -1,4 +1,4 @@
-name: "database-tests"
+name: Database Tests
 on:
   pull_request:
 
