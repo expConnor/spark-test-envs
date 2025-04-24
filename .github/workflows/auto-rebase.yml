@@ -7,9 +7,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4 # Updated to latest version
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Fetch all history for rebase
+          fetch-depth: 0
 
       - name: Set up Git
         run: |
@@ -30,7 +30,7 @@ jobs:
           git pull origin staging
           git checkout main
           git pull origin main
-          if git merge-base origin/staging origin/main == $(git rev-parse origin/staging); then
+          if [ "$(git merge-base origin/staging origin/main)" = "$(git rev-parse origin/staging)" ]; then
             echo "Error: Staging has no unique commits compared to main."
             exit 1
           fi
@@ -40,12 +40,17 @@ jobs:
           git checkout staging
           if ! git rebase origin/main; then
             echo "Rebase failed due to conflicts. Creating issue for manual resolution."
-            git rebase --abort # Abort rebase to prevent partial state
+            git rebase --abort
             curl -X POST \
               -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
               -H "Accept: application/vnd.github.v3+json" \
               https://api.github.com/repos/${{ github.repository }}/issues \
               -d '{"title":"Rebase Conflict on Staging","body":"Rebase of staging onto main failed due to conflicts. Please resolve manually.","labels":["rebase-conflict"]}'
+            exit 1
+          fi
+          # Check if staging differs from main after rebase
+          if [ "$(git rev-parse staging)" = "$(git rev-parse origin/main)" ]; then
+            echo "Error: Rebase resulted in staging matching main. Aborting to prevent overwrite."
             exit 1
           fi
 
@@ -59,11 +64,11 @@ jobs:
           git push origin staging --force
 
       - name: Create PR from staging to main
-        uses: peter-evans/create-pull-request@v6 # Updated to latest version
+        uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           title: "Release: staging to main"
           body: "Automated PR to merge staging into main after rebase."
           branch: staging
           base: main
-          reviewers: "team-member-1,team-member-2" # Replace with your team’s GitHub usernames
+          reviewers: "team-member-1,team-member-2" # Replace with usernames
