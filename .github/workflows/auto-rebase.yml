@@ -1,0 +1,47 @@
+name: On-Demand Rebase and PR to main
+on:
+  workflow_dispatch:
+
+jobs:
+  rebase-and-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Git
+        run: |
+          git config user.name "GitHub Action"
+          git config user.email "action@github.com"
+
+      - name: Rebase staging onto main
+        run: |
+          git fetch origin main staging
+          git checkout main
+          git pull origin main
+          git checkout staging
+          git pull origin staging
+          git rebase origin/main || {
+            echo "Rebase failed due to conflicts. Please resolve manually."
+            curl -X POST \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              https://api.github.com/repos/${{ github.repository }}/issues \
+              -d '{"title":"Rebase Conflict on Staging","body":"Rebase of staging onto main failed due to conflicts. Please resolve manually.","labels":["rebase-conflict"]}'
+            exit 1
+          }
+
+      - name: Force-push staging
+        run: |
+          git push origin staging --force
+
+      - name: Create PR from staging to main
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: "Release: staging to main"
+          body: "Automated PR to merge staging into main after rebase."
+          branch: staging
+          base: main
