@@ -39,3 +39,13 @@ jobs:
           fi
 
           git push origin staging --force
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: staging
+          base: main
+          title: "Merge staging into main"
+          body: "Automated PR created after successful rebase of staging onto main"
+          labels: "automated-pr"
