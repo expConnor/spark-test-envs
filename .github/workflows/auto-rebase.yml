@@ -7,41 +7,63 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4 # Updated to latest version
         with:
-          fetch-depth: 0
+          fetch-depth: 0 # Fetch all history for rebase
 
       - name: Set up Git
         run: |
           git config user.name "GitHub Action"
           git config user.email "action@github.com"
 
-      - name: Rebase staging onto main
+      - name: Log initial branch states
         run: |
           git fetch origin main staging
-          git checkout main
-          git pull origin main
+          echo "Main branch commits:"
+          git log origin/main --oneline --max-count=5
+          echo "Staging branch commits:"
+          git log origin/staging --oneline --max-count=5
+
+      - name: Check if staging has unique commits
+        run: |
           git checkout staging
           git pull origin staging
-          git rebase origin/main || {
-            echo "Rebase failed due to conflicts. Please resolve manually."
+          git checkout main
+          git pull origin main
+          if git merge-base origin/staging origin/main == $(git rev-parse origin/staging); then
+            echo "Error: Staging has no unique commits compared to main."
+            exit 1
+          fi
+
+      - name: Rebase staging onto main
+        run: |
+          git checkout staging
+          if ! git rebase origin/main; then
+            echo "Rebase failed due to conflicts. Creating issue for manual resolution."
+            git rebase --abort # Abort rebase to prevent partial state
             curl -X POST \
               -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
               -H "Accept: application/vnd.github.v3+json" \
               https://api.github.com/repos/${{ github.repository }}/issues \
               -d '{"title":"Rebase Conflict on Staging","body":"Rebase of staging onto main failed due to conflicts. Please resolve manually.","labels":["rebase-conflict"]}'
             exit 1
-          }
+          fi
+
+      - name: Log post-rebase state
+        run: |
+          echo "Staging branch after rebase:"
+          git log staging --oneline --max-count=5
 
       - name: Force-push staging
         run: |
           git push origin staging --force
 
       - name: Create PR from staging to main
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v6 # Updated to latest version
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           title: "Release: staging to main"
           body: "Automated PR to merge staging into main after rebase."
           branch: staging
           base: main
+          reviewers: "team-member-1,team-member-2" # Replace with your team’s GitHub usernames
