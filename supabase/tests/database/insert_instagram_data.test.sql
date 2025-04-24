@@ -342,3 +342,5 @@ SELECT results_eq(
 -- Finish and rollback
 SELECT * FROM finish();
 ROLLBACK;
+
+-- test  comment   .
