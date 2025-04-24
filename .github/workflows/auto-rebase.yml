@@ -1,41 +1,18 @@
-name: Rebase Staging to Main
-on:
-  workflow_dispatch:
+name: Rebase Staging
+on: workflow_dispatch
 
 jobs:
-  rebase-and-pr:
+  rebase:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Set up Git
-        run: |
+      - run: |
           git config user.name "GitHub Action"
           git config user.email "action@github.com"
-
-      - name: Rebase staging onto main
-        run: |
           git fetch origin main staging
           git checkout staging
-
-          # Check if staging has unique commits
-          if [ "$(git merge-base origin/staging origin/main)" = "$(git rev-parse origin/staging)" ]; then
-            echo "Error: Staging has no unique commits compared to main."
-            exit 1
-          fi
-
-          if ! git rebase origin/main; then
-            echo "Rebase failed due to conflicts. Creating issue for manual resolution."
-            git rebase --abort
-            curl -X POST \
-              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-              -H "Accept: application/vnd.github.v3+json" \
-              https://api.github.com/repos/${{ github.repository }}/issues \
-              -d '{"title":"Rebase Conflict on Staging","body":"Rebase of staging onto main failed due to conflicts. Please resolve manually.","labels":["rebase-conflict"]}'
-            exit 1
-          fi
-
+          git rebase origin/main || exit 1
           git push origin staging --force
