@@ -328,3 +328,25 @@ entrypoint = "./functions/tiktok-scraper/index.js"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
 # static_files = [ "./functions/tiktok-scraper/*.html" ]
+
+[functions.user-management]
+enabled = true
+verify_jwt = true
+import_map = "./functions/user-management/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/user-management/index.js"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/user-management/*.html" ]
+
+[functions.test-auth]
+enabled = true
+verify_jwt = true
+import_map = "./functions/test-auth/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/test-auth/index.js"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/test-auth/*.html" ]
